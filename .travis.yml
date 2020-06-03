@@ -11,7 +11,9 @@ language:
 
 cache:
 - ccache
-
+arch:
+    - amd64
+    - arm64
 os:
 - linux
 - osx
@@ -140,6 +142,18 @@ matrix:
         packages:
         - *pkg_deps_common
         - *pkg_deps_doctools
+  - env: BUILD_TYPE=default-with-docs
+    os: linux
+#    dist: xenial
+    arch: arm64
+    dist: trusty
+    compiler: gcc
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu14
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
 # temporary disabled, does not work
 #  - env: BUILD_TYPE=docs
 #    os: linux
@@ -154,6 +168,19 @@ matrix:
         packages:
         - valgrind
         - *pkg_deps_common
+  - env: BUILD_TYPE=valgrind
+    arch: arm64
+    os: linux
+#    dist: xenial
+    dist: trusty
+    compiler: gcc
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu14
+        packages:
+        - valgrind
+        - *pkg_deps_common
+
   - env: BUILD_TYPE=default
     os: windows
   - env: BUILD_TYPE=android
@@ -169,12 +196,28 @@ matrix:
     language: java
     jdk: openjdk8
     compiler: clang
+  - env: BUILD_TYPE=bindings BINDING=jni
+    arch: arm64
+    os: linux
+    dist: trusty
+    language: java
+    jdk: openjdk8
+    compiler: clang
+
   - env: BUILD_TYPE=bindings BINDING=jni BINDING_OPTS=android
     os: linux
     dist: trusty
     language: java
     jdk: openjdk8
     compiler: clang
+  - env: BUILD_TYPE=bindings BINDING=jni BINDING_OPTS=android
+    arch: arm64
+    os: linux
+    dist: trusty
+    language: java
+    jdk: openjdk8
+    compiler: clang
+
   - env: BUILD_TYPE=default ADDRESS_SANITIZER=enabled
     os: linux
 #    dist: xenial
@@ -185,6 +228,18 @@ matrix:
         sources: *pkg_src_zeromq_ubuntu14
         packages:
         - *pkg_deps_common
+  - env: BUILD_TYPE=default ADDRESS_SANITIZER=enabled
+    arch: arm64
+    os: linux
+#    dist: xenial
+    dist: trusty
+    compiler: gcc
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu14
+        packages:
+        - *pkg_deps_common
+
   - env: BUILD_TYPE=check_zproject
     os: linux
 #    dist: xenial
@@ -196,12 +251,27 @@ matrix:
         packages:
         - *pkg_deps_devtools
         - *pkg_deps_zproject
-  - env: BUILD_TYPE=cmake DO_CLANG_FORMAT_CHECK=1 CLANG_FORMAT=clang-format-5.0
+  - env: BUILD_TYPE=check_zproject
+    arch: arm64
+    os: linux
+#    dist: xenial
+    dist: trusty
+    compiler: gcc
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu14
+        packages:
+        - *pkg_deps_devtools
+        - *pkg_deps_zproject
+
+   - env: BUILD_TYPE=cmake DO_CLANG_FORMAT_CHECK=1 CLANG_FORMAT=clang-format-5.0
+   - arch: arm64
+     env: BUILD_TYPE=cmake DO_CLANG_FORMAT_CHECK=1 CLANG_FORMAT=clang-format-5.0
 # For non-cmake users, there is an autotools solution with a bit more overhead
 # to have dependencies ready and pass configure script before making this check).
 # Note that the autotools variant will also require dependencies preinstalled to
 # pass its configure script:
-#  - env: BUILD_TYPE=clang-format-check CLANG_FORMAT=clang-format-5.0
+# - env: BUILD_TYPE=clang-format-check CLANG_FORMAT=clang-format-5.0
     os: linux
     dist: xenial
     addons:
@@ -211,12 +281,38 @@ matrix:
         packages:
         - clang-5.0
         - clang-format-5.0
+ -  env: BUILD_TYPE=clang-format-check CLANG_FORMAT=clang-format-5.0
+    arch: arm64
+    os: linux
+    dist: xenial
+    addons:
+      apt:
+        sources:
+        - llvm-toolchain-xenial-5.0
+        packages:
+        - clang-5.0
+        - clang-format-5.0
+
 #autotools#  - *pkg_deps_prereqs
 # Note: the ABI compliance checker script currently assumes that:
 # 1) Your project sources have a "latest_release" branch or tag
 #    to check out and compare the current commit's ABI to;
 # 2) Prerequisites are available as packages - no custom rebuilds.
   - env: BUILD_TYPE=abi-compliance-checker
+    os: linux
+    dist: xenial
+    addons:
+      apt:
+        sources:
+        - sourceline: 'deb http://ppa.launchpad.net/hnakamur/universal-ctags/ubuntu bionic main'
+          key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x60D954A11017341E'
+        packages:
+        - *pkg_deps_common
+        - universal-ctags
+        - abi-dumper
+        - abi-compliance-checker
+  - env: BUILD_TYPE=abi-compliance-checker
+    arch: arm64
     os: linux
     dist: xenial
     addons:
